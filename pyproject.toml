@@ -1,0 +1,65 @@
+[tool.poetry]
+name = "pv-system-analyser"
+version = "0.1.0"
+description = "A webapp to analyse photovoltaic systems."
+authors = ["Marcos Gabriel Guimarães de Assis <mg.21191077@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
+commitizen = "^3.29.0"
+mypy = "^1.11.1"
+ruff = "^0.6.1"
+interrogate = "^1.7.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "~7.2.2"
+pytest-cov = "^4.0.0"
+pytest-mock = "^3.10.0"
+
+[tool.poe.tasks]
+	[[tool.poe.tasks.install]]
+	help = "Create folders for application's assets and logs."
+	sequence = [
+		# Create directories for local files
+		{cmd = "mkdir assets && mkdir assets/data assets/models assets/references assets/reports"},
+		{cmd = "mkdir logs"},
+		
+	]
+	
+	[[tool.poe.tasks.build]]
+	help = "Build all application's containers."
+	cmd = "docker compose up"
+	
+	[[tool.poe.tasks.test]]
+	help = "Run tests."
+	cmd = "pytest -v"
+	
+	[[tool.poe.tasks.lint]]
+	help = "Apply linters to project code."
+	sequence = [
+		{cmd = "mypy pv_system_analyser/ test/"},
+		{cmd = "ruff check . --fix"}
+	]
+
+	[[tool.poe.tasks.commit]]
+	help = "Commit to current branch."
+	cmd = "cz c"
+
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "semver"
+version_provider = "poetry"
+update_changelog_on_bump = true
+
+[tool.mypy]
+files = ["pv_system_analyser/", "test/"]
+ignore_missing_imports = true
+
