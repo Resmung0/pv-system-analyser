@@ -1,0 +1,1 @@
+from .tiff import TIFFThermogram
