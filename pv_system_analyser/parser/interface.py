@@ -29,3 +29,14 @@ class AnnotationParser(ABC):
         """
         return NotImplementedError()
 
+class MetadataParser(ABC):
+    """
+    Interface class responsible for extracting metadata from files.
+    """
+    @abstractmethod
+    @property
+    def metadata(self) -> dict[str, str]:
+        """
+        Method that extracts metadata from files.
+        """
+        return NotImplementedError()
