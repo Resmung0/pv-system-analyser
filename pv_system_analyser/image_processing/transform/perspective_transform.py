@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from dataclasses import dataclass, field
 
 import numpy as np
 import numpy.typing as npt
@@ -9,15 +10,14 @@ from pv_system_analyser.image_processing.masking import Mask
 from pv_system_analyser.image_processing.thermogram.interface import Thermogram
 
 
+@dataclass(slots=True)
 class PerspectiveTransform(Callable):
     """Transformation responsible for image perspective correction by applying
     homography to masked images.
     """
-
-    def __init__(self) -> None:
-        self.homography = ProjectiveTransform()
-        self.source_points, self.destination_points = None, None
-
+    self.homography: ProjectiveTransform = field(lambda: ProjectiveTransform())
+    self.source_points: npt.NDArray[np.uint8] | None = field(lambda: None)
+    self.destination_points: npt.NDArray[np.uint8] | None = field(lambda: None)
 
     def __call__(
         self,
