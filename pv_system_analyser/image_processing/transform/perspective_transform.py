@@ -15,9 +15,9 @@ class PerspectiveTransform(Callable):
     """Transformation responsible for image perspective correction by applying
     homography to masked images.
     """
-    self.homography: ProjectiveTransform = field(lambda: ProjectiveTransform())
-    self.source_points: npt.NDArray[np.uint8] | None = field(lambda: None)
-    self.destination_points: npt.NDArray[np.uint8] | None = field(lambda: None)
+    homography: ProjectiveTransform = field(lambda: ProjectiveTransform())
+    source_points: npt.NDArray[np.uint8] | None = field(lambda: None)
+    destination_points: npt.NDArray[np.uint8] | None = field(lambda: None)
 
     def __call__(
         self,
