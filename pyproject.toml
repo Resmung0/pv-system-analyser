@@ -22,6 +22,15 @@ pytest = "~7.2.2"
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.10.0"
 
+
+[tool.poetry.group.data-processing.dependencies]
+flyr = "^3.3.1"
+numpy = "^2.1.2"
+pandas = "^2.2.3"
+scikit-image = "^0.24.0"
+exifread = "^3.0.0"
+matplotlib = "^3.9.2"
+
 [tool.poe.tasks]
 	[[tool.poe.tasks.install]]
 	help = "Create folders for application's assets and logs."
