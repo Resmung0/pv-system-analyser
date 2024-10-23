@@ -25,11 +25,18 @@ pytest-mock = "^3.10.0"
 
 [tool.poetry.group.data-processing.dependencies]
 flyr = "^3.3.1"
-numpy = "^2.1.2"
+numpy = "^1.2"
 pandas = "^2.2.3"
 scikit-image = "^0.24.0"
 exifread = "^3.0.0"
 matplotlib = "^3.9.2"
+
+
+[tool.poetry.group.machine-learning.dependencies]
+lightning = "^2.4.0"
+torchmetrics = "^1.5.0"
+torch = "^2.5.0"
+torchvision = "^0.20.0"
 
 [tool.poe.tasks]
 	[[tool.poe.tasks.install]]
