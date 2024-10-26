@@ -1,1 +1,2 @@
 from .model_factory import ModelFactory
+from .datamodule_factory import DataModuleFactory

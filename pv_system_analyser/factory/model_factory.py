@@ -1,4 +1,4 @@
-from typing import Callable, Literal
+from typing import Literal
 import logging
 
 import torch
@@ -13,7 +13,12 @@ class ModelFactory(BaseFactory):
     """
     
     @classmethod
-    def create(cls, name: str, **kwargs) -> None | LightningModule:
+    def create(
+        cls,
+        name: str,
+        mode: Literal['training', 'inference'] = 'inference',
+        **kwargs
+    ) -> None | LightningModule:
         """
         Factory command to create the model. 
         
@@ -25,16 +30,9 @@ class ModelFactory(BaseFactory):
         
         Returns:
             An instance of the model that is created.
-        """
-        if name not in cls.registry:
-            msg = f"Model {name} does not exist in the registry. Probably weren't implemented."
-            logging.warning(msg)
-            return None
-        
-        if 'mode' not in kwargs:
-            kwargs['mode'] = 'cpu'
-        device = cls._choose_process_device(kwargs['mode'])
-        model = cls.registry[name](**kwargs)
+        """        
+        device = cls._choose_process_device(mode)
+        model = cls.get_object(name, **kwargs)
         return model.to(device)
 
     @staticmethod
@@ -58,23 +56,4 @@ class ModelFactory(BaseFactory):
             case 'inference':
                 process_unity = 'cpu'
         return torch.device(process_unity)
-    
-    @classmethod
-    def register(cls, name: str) -> Callable:
-        """
-        Method to register a model to the internal registry.
-        
-        Args:
-            name (str): The name of the executor.
-    
-        Returns:
-            The Executor class itself.
-        """
-        def wrapper(wrapped_class: LightningModule) -> Callable:
-            if name in cls.registry:
-                msg = f"Model {name} already exists. Will replace it"
-                logging.warning(msg)
-            cls.registry[name] = wrapped_class
-            return wrapped_class
-        return wrapper
     
