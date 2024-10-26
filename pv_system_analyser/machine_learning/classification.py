@@ -3,8 +3,10 @@ from torch import nn, optim
 from torchmetrics.classification import F1Score
 
 from .loss import FocalLoss
+from pv_system_analyser.factory import ModelFactory
 
 
+ModelFactory.register('cnn')
 class CNNModule(pl.LightningModule):
     def __init__(self, n_classes, learning_rate, fl_alpha, fl_gamma):
         super().__init__()
