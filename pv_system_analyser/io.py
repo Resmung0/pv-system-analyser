@@ -23,12 +23,12 @@ def _read_json_annotation(
     Returns:
         Data from JSON file.
     """
-    with path.open("r", encoding="utf-8") as file:
-        match dataset_type:
-            case 'segmentation':
+    match dataset_type:
+        case 'segmentation':
+            with path.open("r", encoding="utf-8") as file:
                 data = json.load(file)
-            case 'classification':
-                data = pd.read_json(file, orient='index').sort_index()
+        case 'classification':
+            data = pd.read_json(path, orient='index').sort_index()
     return data
 
 def read_mask(file_path: str) -> Mask:
