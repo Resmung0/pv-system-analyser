@@ -1,48 +1,54 @@
 """File that defines functions that read different kind of data."""
+
 import json
 from pathlib import Path
+from typing import Literal
 
 import pandas as pd
 from flyr import FlyrThermogram, unpack
 
-from .image_processing.thermogram import TIFFThermogram
 from .image_processing.masking import Mask
+from .image_processing.thermogram import TIFFThermogram
 from .parser.utils import choose_parser
 
 
 def _read_json_annotation(
-    path: Path, dataset_type: str
+    path: str, dataset_type: Literal["classification", "segmentation"]
 ) -> dict[str, str | int] | pd.DataFrame:
     """
     Function for reading JSON annotation file.
-    
+
     Args:
-        path: Path to JSON file.
-        dataset_type: Type of dataset.
+        path (str): Path to JSON file.
+        dataset_type (Literal['classification', 'segmentation']): Type of dataset.
 
     Returns:
         Data from JSON file.
     """
     match dataset_type:
-        case 'segmentation':
-            with path.open("r", encoding="utf-8") as file:
+        case "segmentation":
+            with open(path, "r", encoding="utf-8") as file:
                 data = json.load(file)
-        case 'classification':
-            data = pd.read_json(path, orient='index').sort_index()
+        case "classification":
+            data = pd.read_json(path, orient="index").sort_index()
     return data
+
 
 def read_mask(file_path: str) -> Mask:
     """Function for mask creation from JSON annotation file."""
-    file_path = Path(file_path)
     dataset = [
-        parent for parent in file_path.parents if parent.name == 'datasets'
+        parent.as_posix()
+        for parent in Path(file_path).parents
+        if parent.name == "datasets"
     ]
-    data = _read_json_annotation(file_path, dataset_type='segmentation')
+    data = _read_json_annotation(file_path, dataset_type="segmentation")
     parser = choose_parser(dataset[0], data)
     return Mask(parser.masks)
 
+
 def read_thermogram(
-    file_path: str, tiff_info: dict[str, str] | None = None
+    file_path: str,
+    tiff_info: dict[str, str | None | Literal["thermomap", "other"]] | None = None,
 ) -> FlyrThermogram | TIFFThermogram:
     """Read thermogram data from RJPG and TIFF files.
 
@@ -54,16 +60,11 @@ def read_thermogram(
     Returns:
         FlyrThermogram | TIFFThermogram: Thermogram data.
     """
-    file_format = Path(file_path).suffix.strip('.')
+    file_format = Path(file_path).suffix.strip(".")
     if file_format in ("jpg", "JPG"):
         thermogram = unpack(file_path)
     elif file_format in ("tif", "tiff"):
         if tiff_info is None:
-            tiff_info = {
-                "metadata_path": None,
-                "optical_path": None,
-                "method": "thermomap",
-            }
+            tiff_info = dict(metadata_path=None, optical_path=None, method="thermomap")
         thermogram = TIFFThermogram(file_path, **tiff_info)
     return thermogram
-

@@ -1,10 +1,10 @@
-from .interface import Parser
+from .interface import AnnotationParser
 from .dataset.pst_annotation_parser import PSTAnnotationParser
 
 
 def choose_parser(
     dataset_name: str, data: dict[str, str | int]
-) -> Parser:
+) -> AnnotationParser:
     """
     Helper function to choose segmentation dataset proper parser.
     """

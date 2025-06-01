@@ -104,11 +104,15 @@ After this, just clone the repo:
 git clone https://github.com/Resmung0/pv-system-analyser.git 
 ```
 
-And run the `install` task:
+And run the `install` task to create a `.env` file and some folders for the application to run:
 
 ```bash
 poe install
 ```
+After this, you have to populate the `.env` file with the following variables:
+
+- **Kaggle credentials**: You need to specify your `KAGGLE_USERNAME` and `KAGGLE_KEY` variables. You can get your credentials from [here](https://www.kaggle.com/docs/api);
+
 
 ## 3.2 Running the application
 

@@ -1,45 +1,73 @@
-from skimage import draw, util
-import numpy as np
-import numpy.typing as npt
+from functools import wraps
+from typing import TypedDict
 
+import numpy as np
+from skimage import draw, util
+
+from pv_system_analyser.constants import INT_ARRAY, STRING_ARRAY
 from pv_system_analyser.parser.interface import AnnotationParser
+
+
+class Coordinate(TypedDict):
+    x: float
+    y: float
+
+
+class Instance(TypedDict):
+    corners: list[Coordinate]
+    center: Coordinate
+    defected_module: bool
+
+
+class PSTData(TypedDict):
+    instances: list[Instance]
+
+
+def validate_shape(func):
+    @wraps(func)
+    def wrapper(self, data, shape=(512, 640)):
+        if not isinstance(shape, tuple) or len(shape) != 2:
+            raise ValueError("Shape must be a tuple of length 2")
+
+        if not all(isinstance(dim, int) and dim > 0 for dim in shape):
+            raise ValueError("Shape dimensions must be positive integers")
+
+        return func(self, data, shape)
+
+    return wrapper
 
 
 class PSTAnnotationParser(AnnotationParser):
     """
     Class that parse data extracted from Photovoltaic System Thermography dataset.
     """
+
+    @validate_shape
     def __init__(
         self,
-        data: dict[str, str | int],
-        shape: tuple[int, int] = (512, 640)
+        data: PSTData,
+        shape: tuple[int, int] = (512, 640),
     ) -> None:
-        """        
-        Args:
-            shape (tuple[int, int], optional): Dimensions of corresponding image mask. 
-            Defaults to (512, 640).
-        """
-        self.shape, self.__data = shape, data['instances']
+        self.__shape, self.__data = shape, data["instances"]
 
     @property
-    def masks(self) -> npt.NDArray[np.uint8]:
-        return np.array([self._parse_mask(data) for data in self.__data])
-    
-    def _parse_mask(self, instance: dict[str, str | int]) -> npt.NDArray[np.uint8]:
-        polygon = np.array(
-            [[coords["y"], coords["x"]] for coords in instance["corners"]]
-        )
-        polygon = draw.polygon2mask(self.shape, polygon)
-        return util.img_as_ubyte(polygon)
-    
-    @property
-    def centers(self) -> npt.NDArray[np.uint8]:
-        return np.array([instance['center'] for instance in self.__data])
-    
-    @property
-    def classes(self) -> npt.NDArray[np.dtype.str]:
-        return np.array([self._parse_class(data) for data in self.__data])
+    def masks(self) -> INT_ARRAY:
+        def parse_mask(corners: list[Coordinate]) -> INT_ARRAY:
+            polygon = np.array([[coords["y"], coords["x"]] for coords in corners])
+            polygon = draw.polygon2mask(self.__shape, polygon)
+            return util.img_as_ubyte(polygon)
 
-    @staticmethod
-    def _parse_class(instance) -> str:
-        return "defected" if instance["defected_module"] else "non-defected"
+        parsed_mask = [parse_mask(data["corners"]) for data in self.__data]
+        return np.array(parsed_mask, dtype="int")
+
+    @property
+    def centers(self) -> INT_ARRAY:
+        return np.array([instance["center"] for instance in self.__data])
+
+    @property
+    def classes(self) -> STRING_ARRAY:
+        def parse_class(is_defected: bool) -> str:
+            return "defected" if is_defected else "non-defected"
+
+        modules_classes = [parse_class(data["defected_module"]) for data in self.__data]
+        return np.array(modules_classes, dtype=np.str_)

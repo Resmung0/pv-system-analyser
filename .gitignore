@@ -1,3 +1,5 @@
 # Enviroment
 __pycache__
 .venv
+.env
+.mypy_cache

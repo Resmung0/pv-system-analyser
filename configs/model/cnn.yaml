@@ -1,0 +1,7 @@
+model:
+  name: cnn
+  n_classes: 10
+  optimizer: Adam
+  learning_rate: 0.001
+  fl_alpha: 0.25
+  fl_gamma: 2.0

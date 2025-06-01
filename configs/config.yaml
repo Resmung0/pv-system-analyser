@@ -1,0 +1,8 @@
+defautls:
+ - model: cnn
+ 
+experiment:
+  epochs: 100
+  batch_size: 32
+  num_workers: 1
+ 

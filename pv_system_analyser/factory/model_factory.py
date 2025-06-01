@@ -18,7 +18,7 @@ class ModelFactory(BaseFactory):
         name: str,
         mode: Literal['training', 'inference'] = 'inference',
         **kwargs
-    ) -> None | LightningModule:
+    ) -> LightningModule:
         """
         Factory command to create the model. 
         

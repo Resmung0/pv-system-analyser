@@ -1,0 +1,5 @@
+model:
+  name: auto_encoder
+  optimizer: Adam
+  learning_rate: 0.001
+  

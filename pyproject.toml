@@ -30,6 +30,9 @@ pandas = "^2.2.3"
 scikit-image = "^0.24.0"
 exifread = "^3.0.0"
 matplotlib = "^3.9.2"
+kagglehub = "^0.3.3"
+pydantic = "^2.9.2"
+pandera = "^0.20.4"
 
 
 [tool.poetry.group.machine-learning.dependencies]
@@ -37,6 +40,8 @@ lightning = "^2.4.0"
 torchmetrics = "^1.5.0"
 torch = "^2.5.0"
 torchvision = "^0.20.0"
+scikit-learn = "^1.5.2"
+dvclive = "^3.48.0"
 
 [tool.poe.tasks]
 	[[tool.poe.tasks.install]]
@@ -78,4 +83,11 @@ update_changelog_on_bump = true
 [tool.mypy]
 files = ["pv_system_analyser/", "test/"]
 ignore_missing_imports = true
+plugins = ["pandera.mypy", "numpy.typing.mypy_plugin", "pydantic.mypy"]
 
+
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
